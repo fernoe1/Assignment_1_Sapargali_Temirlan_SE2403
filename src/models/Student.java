@@ -2,11 +2,27 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Map;
+
+import static java.util.Map.entry;
 
 public class Student extends Person {
     private int id;
     private static int id_gen;
-    ArrayList<Integer> grades = new ArrayList<>();
+    private final ArrayList<Integer> grades = new ArrayList<>();
+    private static final Map<Integer, Double> gradesToGPA = Map.ofEntries(
+            entry(100, 4.0),
+            entry(95, 4.0),
+            entry(90, 3.67),
+            entry(85, 3.33),
+            entry(80, 3.0),
+            entry(75, 2.67),
+            entry(70, 2.33),
+            entry(65, 2.0),
+            entry(60, 1.67),
+            entry(55, 1.33),
+            entry(50, 1.0)
+    );
 
     public Student(String name, String surname, int age, String gender) {
         super(name, surname, age, gender);
@@ -17,13 +33,24 @@ public class Student extends Person {
         grades.add(grade);
     }
 
-    public double calculateGPA () {
-        int sum = 0;
+    public double calculateGPA() {
+        double sum = 0;
         for (int grade : grades) {
             sum += grade;
         }
+        int overall = (int) ((sum / grades.size()));
 
-        return ((double) sum / grades.size()) * 0.04;
+        return convertToGPA(overall);
+    }
+
+    private static double convertToGPA(int grade) {
+        grade -= grade % 5;
+        Double gpa = gradesToGPA.get(grade);
+        if (gpa == null) {
+            return 0;
+        }
+
+        return gpa;
     }
 
     public static Comparator<Student> compareGpa() {
